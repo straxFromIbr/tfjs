@@ -10,7 +10,7 @@
 				document.write(img);
 				//const tensor =  tf.browser.fromPixels(img);
 			//	document.write(tensor);
-	    		const model = await tf.loadLayersModel("https://raw.githubusercontent.com/straxFromIbr/tfjs/main/dalek_or_cyberman/modeljs/model.json");
+	    		const model = await tf.loadLayersModel("https://raw.githubusercontent.com/straxFromIbr/tfjs/main/dalek_or_cyberman/modeljs2/model.json");
 
 				const xs = tf.tensor([-0.5]);
 				const y_pred = await model.predict(xs).data();
