@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+    <script>
+      async function run(){
+        const model = await tf.loadLayersModel("http://localhost:8000/modeljs/model.json");
+
+        const xs = tf.tensor([-0.5]);
+	const y_pred = await model.predict(xs).data();
+        document.write(y_pred);
+      }
+      run();
+    </script>
+  </body>
+</html>
