@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
-    <script>
-      async function run(){
-        const model = await tf.loadLayersModel("http://localhost:8000/modeljs/model.json");
+	<body>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+		<img id="img" src="http://localhost:8000/cyberman_000.jpg">
+		<script>
+			async function run(){
+				const img = document.getElementById("img");
+				console.log('img type after get bytag', typeof img);
+				document.write(img);
+				//const tensor =  tf.browser.fromPixels(img);
+			//	document.write(tensor);
+	    		const model = await tf.loadLayersModel("https://raw.githubusercontent.com/straxFromIbr/tfjs/main/dalek_or_cyberman/modeljs/model.json");
 
-        const xs = tf.tensor([-0.5]);
-	const y_pred = await model.predict(xs).data();
-        document.write(y_pred);
-      }
-      run();
-    </script>
-  </body>
+				const xs = tf.tensor([-0.5]);
+				const y_pred = await model.predict(xs).data();
+				document.write(y_pred);
+      		}
+      		run();
+    	</script>
+	</body>
 </html>
