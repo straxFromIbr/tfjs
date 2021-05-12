@@ -1,22 +1,121 @@
 <!DOCTYPE html>
 <html>
-	<body>
-		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
-		<img id="img" src="http://localhost:8000/cyberman_000.jpg">
-		<script>
-			async function run(){
-				const img = document.getElementById("img");
-				console.log('img type after get bytag', typeof img);
-				document.write(img);
-				//const tensor =  tf.browser.fromPixels(img);
-			//	document.write(tensor);
-	    		const model = await tf.loadLayersModel("https://raw.githubusercontent.com/straxFromIbr/tfjs/main/dalek_or_cyberman/modeljs2/model.json");
 
-				const xs = tf.tensor([-0.5]);
-				const y_pred = await model.predict(xs).data();
-				document.write(y_pred);
-      		}
-      		run();
-    	</script>
-	</body>
+<body>
+	<!-- <img id="img" src="http://localhost:8000/dalek_026.jpgs" width="192" height="192"> -->
+	<!-- <img id="img2" src="http://localhost:8000/dalek.jpg" width="192" height="192"> -->
+	<!-- <img id="img3" src="https://www.lacitedesnuages.be/68940-large_default/doctor-who-skaro-city-dalek-1-21-figure-7cm.jpg" width="192" height="192"> -->
+
+	<input type="file" id="example" accept="image/*">
+	<input type="button" value="推論！" onclick="myfunc()">
+	<div id="preview"></div>
+	<p id="result">
+
+	</p>
+
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+	<script>
+		async function run(img) {
+			// const img = document.getElementById("img");
+			// const img2 = document.getElementById("usrimg");
+			// document.write(img);
+			console.log("ee", img);
+			// img = elm
+			const tensor = tf.browser.fromPixels(img);
+			const resized_tensor = tf.image.resizeBilinear(tensor, [192, 192]).reshape([1, 192, 192, 3]);
+			const opd_tensor = resized_tensor.div(255).mul(2).sub(1);
+			console.log(tf.max(opd_tensor))
+			console.log(tf.min(opd_tensor))
+			const model = await tf.loadLayersModel("./modeljs/model.json");
+			const y_pred = await model.predict(opd_tensor).sigmoid().data();
+			console.log(y_pred);
+			var ih = document.getElementById("result")
+
+			if (y_pred > 0.5) {
+				ih.innerHTML = 'こいつはダーレク ';
+			} else {
+				ih.innerHTML = 'こいつはサイバーマン ';
+			}
+			// document.write(y_pred);
+		}
+
+
+		function previewFile(file) {
+			// プレビュー画像を追加する要素
+			const preview = document.getElementById('preview');
+
+			// FileReaderオブジェクトを作成
+			const reader = new FileReader();
+
+			// ファイルが読み込まれたときに実行する
+			reader.onload = function (e) {
+				console.log(e);
+				const imageUrl = e.target.result; // 画像のURLはevent.target.resultで呼び出せる
+				// const img = new Image();
+				img = document.createElement("img"); // img要素を作成
+				// document.write("<img src=\"" + imageUrl + "\"/>")
+				img.src = imageUrl; // 画像のURLをimg要素にセット
+
+				var diff = 0;
+				if (img.width > img.height) {
+					img.width = 192;
+					diff = 192 - img.height;
+					img.style.margin = "100px";
+					// img.hspace = diff;
+				} else {
+					img.height = 192;
+					diff = 192 - img.width;
+					img.style.margin = "199px";
+					// img.vspace = diff;
+				}
+
+
+				img.id = 'usrimg';
+				preview.appendChild(img);
+
+
+				// console.log("org w : ", img.width, "org h : ", img.height);
+
+				// // console.log('ae', img);
+			}
+
+			// いざファイルを読み込む
+			reader.readAsDataURL(file);
+		}
+
+
+		// <input>でファイルが選択されたときの処理
+		const fileInput = document.getElementById('example');
+		const handleFileSelect = () => {
+			const files = fileInput.files;
+
+			// previewFile(f/ile);
+			for (let i = 0; i < files.length; i++) {
+				previewFile(files[i]);
+				console.log(files);
+
+
+			}
+			// const board = document.getElementById("board");
+			// const ctx = board.getContext("2d");
+			// // img.src = imageUrl;
+			// var img = new Image();
+			// console.log(img);
+			// img = document.getElementById('usrimg');
+			// img.onload = () => {
+			// 	ctx.drawImage(img, 0, 0,);
+			// };
+
+		}
+
+		var myfunc = function () {
+			let elm = document.getElementById('usrimg');
+			// document.write(elm);
+			run(elm);
+
+		}
+		fileInput.addEventListener('change', handleFileSelect);
+	</script>
+</body>
+
 </html>
