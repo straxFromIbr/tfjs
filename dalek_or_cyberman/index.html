@@ -2,33 +2,34 @@
 <html>
 
 <body>
-	<!-- <img id="img" src="http://localhost:8000/dalek_026.jpgs" width="192" height="192"> -->
-	<!-- <img id="img2" src="http://localhost:8000/dalek.jpg" width="192" height="192"> -->
-	<!-- <img id="img3" src="https://www.lacitedesnuages.be/68940-large_default/doctor-who-skaro-city-dalek-1-21-figure-7cm.jpg" width="192" height="192"> -->
+	<div align="center">
 
-	<input type="file" id="example" accept="image/*">
-	<input type="button" value="推論！" onclick="myfunc()">
-	<div id="preview"></div>
-	<p id="result">
-
-	</p>
-
+		<p>
+			<input type="file" id="example" accept="image/*">
+		</p>
+		<p>
+			<input type="button" value="推論！" onclick="myfunc()">
+		</p>
+		<div id="preview"></div>
+		<p id="result"></p>
+	</div>
 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
 	<script>
 		async function run(img) {
-			// const img = document.getElementById("img");
-			// const img2 = document.getElementById("usrimg");
-			// document.write(img);
-			console.log("ee", img);
-			// img = elm
+			//			var diff = 192 - ( img.height == 192 ? img.width : img.height );
+			var pad_ary;
+
+			if (img.width == 192) {
+				pad_ary = [[0, 192 - img.height], [0, 0], [0, 0]];
+			} else {
+				pad_ary = [[0, 0], [0, 192 - img.width], [0, 0]];
+			}
+			console.log(img, pad_ary);
 			const tensor = tf.browser.fromPixels(img);
-			const resized_tensor = tf.image.resizeBilinear(tensor, [192, 192]).reshape([1, 192, 192, 3]);
-			const opd_tensor = resized_tensor.div(255).mul(2).sub(1);
-			console.log(tf.max(opd_tensor))
-			console.log(tf.min(opd_tensor))
+			const resized_tensor = tensor.pad(pad_ary).reshape([1, 192, 192, 3]).div(255).mul(2).sub(1);
+			console.log(resized_tensor);
 			const model = await tf.loadLayersModel("./modeljs/model.json");
-			const y_pred = await model.predict(opd_tensor).sigmoid().data();
-			console.log(y_pred);
+			const y_pred = await model.predict(resized_tensor).sigmoid().data();
 			var ih = document.getElementById("result")
 
 			if (y_pred > 0.5) {
@@ -36,60 +37,40 @@
 			} else {
 				ih.innerHTML = 'こいつはサイバーマン ';
 			}
-			// document.write(y_pred);
 		}
 
 
 		function previewFile(file) {
-			// プレビュー画像を追加する要素
 			const preview = document.getElementById('preview');
 
-			// FileReaderオブジェクトを作成
 			const reader = new FileReader();
 
-			// ファイルが読み込まれたときに実行する
 			reader.onload = function (e) {
-				console.log(e);
-				const imageUrl = e.target.result; // 画像のURLはevent.target.resultで呼び出せる
-				// const img = new Image();
-				img = document.createElement("img"); // img要素を作成
-				// document.write("<img src=\"" + imageUrl + "\"/>")
-				img.src = imageUrl; // 画像のURLをimg要素にセット
+				const imageUrl = e.target.result;
+				img = document.createElement("img");
+				img.src = imageUrl;
 
-				var diff = 0;
 				if (img.width > img.height) {
 					img.width = 192;
-					diff = 192 - img.height;
-					img.style.margin = "100px";
-					// img.hspace = diff;
 				} else {
 					img.height = 192;
-					diff = 192 - img.width;
-					img.style.margin = "199px";
-					// img.vspace = diff;
 				}
 
-
+				console.log(img);
 				img.id = 'usrimg';
 				preview.appendChild(img);
 
-
-				// console.log("org w : ", img.width, "org h : ", img.height);
-
-				// // console.log('ae', img);
+				console.log("org w : ", img.width, "org h : ", img.height);
 			}
 
-			// いざファイルを読み込む
 			reader.readAsDataURL(file);
 		}
 
 
-		// <input>でファイルが選択されたときの処理
 		const fileInput = document.getElementById('example');
 		const handleFileSelect = () => {
 			const files = fileInput.files;
 
-			// previewFile(f/ile);
 			for (let i = 0; i < files.length; i++) {
 				previewFile(files[i]);
 				console.log(files);
