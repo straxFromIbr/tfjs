@@ -16,7 +16,6 @@
 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
 	<script>
 		async function run(img) {
-			//			var diff = 192 - ( img.height == 192 ? img.width : img.height );
 			var pad_ary;
 
 			if (img.width == 192) {
@@ -77,23 +76,12 @@
 
 
 			}
-			// const board = document.getElementById("board");
-			// const ctx = board.getContext("2d");
-			// // img.src = imageUrl;
-			// var img = new Image();
-			// console.log(img);
-			// img = document.getElementById('usrimg');
-			// img.onload = () => {
-			// 	ctx.drawImage(img, 0, 0,);
-			// };
 
 		}
 
 		var myfunc = function () {
 			let elm = document.getElementById('usrimg');
-			// document.write(elm);
 			run(elm);
-
 		}
 		fileInput.addEventListener('change', handleFileSelect);
 	</script>
